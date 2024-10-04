@@ -1,88 +1,76 @@
-# Ex.No: 1 B                    CONVERSION OF NON STATIONARY TO STATIONARY DATA
-# Name : A joans jay authers 
-## AIM:
-To perform regular differncing,seasonal adjustment and log transformatio on international airline passenger data
+# Ex.No: 1B                     CONVERSION OF NON STATIONARY TO STATIONARY DATA
+## Date: 
 
-## ALGORITHM:
+### AIM:
+To perform regular differncing,seasonal adjustment and log transformatio on international airline passenger data
+### ALGORITHM:
 1. Import the required packages like pandas and numpy
 2. Read the data using the pandas
 3. Perform the data preprocessing if needed and apply regular differncing,seasonal adjustment,log transformation.
 4. Plot the data according to need, before and after regular differncing,seasonal adjustment,log transformation.
 5. Display the overall results.
-   
-## PROGRAM:
-### Importing the necessary Packages:
-```
+### PROGRAM:
+<b>IMPORTING PACKAGES:</b>
+```python
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+%matplotlib inline
+train = pd.read_csv('Electric_Production.csv')
+train['DATE'] = pd.to_datetime(train['DATE'], format='%d/%m/%Y')
+train.head()
 ```
+<b>REGULAR DIFFERENCING:</b>
+```python
+from statsmodels.tsa.stattools import adfuller
+def adf_test(timeseries):
+    print ('Results of Dickey-Fuller Test:')
+    dftest = adfuller(timeseries, autolag='AIC')
+    dfoutput = pd.Series(dftest[0:4], index=['Test Statistic','p-value','#Lags Used'
+               ,'Number of Observations Used'])
+    for key,value in dftest[4].items():
+       dfoutput['Critical Value (%s)'%key] = value
+    print (dfoutput)
+adf_test(train['IPG2211A2N'])
+train['DATE'] = pd.to_datetime(train['DATE'], format='%d/%m/%Y')
+train['Year'] = train['DATE'].dt.year
+```
+<b>SEASONAL ADJUSTMENT:</b>
+```python
+data=train
+data['SeasonalAdjustment'] = data.iloc[:,1] - data.iloc[:,1].shift(12)
+data['SeasonalAdjustment'].dropna()
+x=data['Year']
+y=data["SeasonalAdjustment"]
+plt.plot(x,y,color='black')
+plt.title("ElectroGraph")
+plt.xlabel("<-----Year---->",color='blue')
+plt.ylabel("<-----Usage---->",color='red')
+plt.show()
+```
+<b>LOG TRANSFORMATION:</b>
+```python
+data1=train
+data1['log']=np.log(data1['IPG2211A2N_diff']).dropna()
+data1=data1.dropna()
+x=data1['Year']
+y=data1['log']
+plt.xlabel('Year',color='blue')
+plt.ylabel('Log Values',color='red')
+```
+### OUTPUT:
 
-### Loading the dataset:
-```
-data=pd.read_csv('/content/international-airline-passengers.csv')
-```
+<b>REGULAR DIFFERENCING:</b>
 
-### Plot the data without Conversion:
-```
-x=data['Month']
-y=data['International airline passengers: monthly totals in thousands. Jan 49 ? Dec 60']
-plt.xlabel('Month')
-plt.ylabel('International airline passengers: monthly totals in thousands.')
-plt.plot(x,y)
-```
+![image](https://github.com/Pavan-Gv/TSA_EXP1B/assets/94827772/0ac0763a-5c24-4edf-a629-c0bca584620b)
 
-### REGULAR DIFFERENCING
-```
-data3=data
-data3['diff']=data3['International airline passengers: monthly totals in thousands. Jan 49 ? Dec 60'].diff(periods=1)
-data3=data3.dropna()
-x=data3['Month']
-y=data3['diff']
-plt.xlabel('Month')
-plt.ylabel('International airline passengers: monthly totals in thousands.')
-plt.plot(x,y)
-```
+<b>SEASONAL ADJUSTMENT:</b>
 
-### SEASONAL ADJUSTMENT
-```
-data1=data
-data1['SeasonalAdjustment'] = data1['International airline passengers: monthly totals in thousands. Jan 49 ? Dec 60'] - data1['International airline passengers: monthly totals in thousands. Jan 49 ? Dec 60'].shift(12)
-data1['SeasonalAdjustment'].dropna()
-x=data1['Month']
-y=data1["SeasonalAdjustment"]
-plt.xlabel('Month')
-plt.ylabel('International airline passengers: monthly totals in thousands.')
-plt.plot(x,y)
-```
+![image](https://github.com/Pavan-Gv/TSA_EXP1B/assets/94827772/e121a175-edfc-4cdd-bddd-db6dca44f5d0)
 
-### LOG TRANSFORMATION
-```
-data2=data
-data2['log']=np.log(data2['diff']).dropna()
-data2=data2.dropna()
-x=data2['Month']
-y=data2['log']
-plt.xlabel('Month')
-plt.ylabel('International airline passengers: monthly totals in thousands.')
-# plt.figure(figsize=(8, 6)) 
-plt.plot(x,y)
-```
+<b>LOG TRANSFORMATION:</b>
 
-## OUTPUT:
-### WITHOUT CONVERSION:
-![t1](https://github.com/Ishu-Vasanth/TSA_EXP1B/assets/94154614/c6110233-a143-44fc-8055-73256231bdb1)
-
-### REGULAR DIFFERENCING:
-![t2](https://github.com/Ishu-Vasanth/TSA_EXP1B/assets/94154614/f13bc5b1-f547-4a2e-b52e-53bee0ba4166)
-
-### SEASONAL ADJUSTMENT:
-![t3](https://github.com/Ishu-Vasanth/TSA_EXP1B/assets/94154614/9e15eef9-4278-486b-9fa6-766b373ecc73)
-
-### LOG TRANSFORMATION:
-![t4](https://github.com/Ishu-Vasanth/TSA_EXP1B/assets/94154614/75a84c2a-e8d5-4e98-b88e-26e6da9d5d9d)
-
+![image](https://github.com/Pavan-Gv/TSA_EXP1B/assets/94827772/dcfa8245-c1b6-4358-ba2f-44f5e029d38f)
 
 ### RESULT:
-Thus we have created the python code for the conversion of non stationary to stationary data on international airline passenger
-data.
+Thus we have created the python code for the conversion of non stationary to stationary data on international airline passenger data.
